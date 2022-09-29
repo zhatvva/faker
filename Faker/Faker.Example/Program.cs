@@ -1,16 +1,9 @@
 ﻿using Faker.Core.Interfaces;
 using System.Linq.Expressions;
-using System.Reflection;
+using Faker.Core.Services;
 
-var config = new Config();
-config.Add<Config, string, Generator>(c => c.Name);
-var intType = typeof(int);
-foreach (var constructor in intType.GetConstructors())
-{
-    Console.WriteLine(constructor.GetParameters().Select(p => p.Name).ToArray());
-}
+var faker = new FakerService();
 Console.ReadLine();
-
 
 class Config : IFakerConfig
 {
@@ -29,7 +22,3 @@ class Config : IFakerConfig
     }
 }
 
-class Generator : IGenerator
-{
-
-}
