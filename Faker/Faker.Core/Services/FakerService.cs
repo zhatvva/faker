@@ -24,7 +24,7 @@ namespace Faker.Core.Services
             return entity;
         }
 
-        private object Create(Type type)
+        public object Create(Type type)
         {
             throw new NotImplementedException();
         }
@@ -33,7 +33,7 @@ namespace Faker.Core.Services
         {
             var assembly = Assembly.GetExecutingAssembly();
             var generators = assembly.DefinedTypes
-                .Where(t => t.GetInterface(nameof(IGenerator)) != null && t.IsClass)
+                .Where(t => t.IsAssignableTo(typeof(IGenerator)) && t.IsClass)
                 .ToList();
             
             var result = new List<IGenerator>(generators.Count);
