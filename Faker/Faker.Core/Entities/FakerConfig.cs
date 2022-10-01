@@ -6,7 +6,7 @@ namespace Faker.Core.Entities
 {
     public class FakerConfig : IFakerConfig
     {            
-        private Dictionary<Type, Dictionary<string, IGenerator>> _configuredGenerators = new();
+        private readonly Dictionary<Type, Dictionary<string, IGenerator>> _configuredGenerators = new();
 
         public void AddGenerator<TType, TField, TGenerator>(Expression<Func<TType, TField>> expression) where TGenerator : IGenerator
         {
@@ -24,19 +24,20 @@ namespace Faker.Core.Entities
             generators.AddOrUpdate(fieldName, generator);
         }
 
-        public IGenerator GetGenerator(Type type, string field)
+        public bool TryGetGenerator(Type type, string field, out IGenerator generator)
         {
+            generator = null;
             if (!_configuredGenerators.TryGetValue(type, out var generators))
             {
-                return null;
+                return false;
             }
 
-            if (!generators.TryGetValue(field, out var generator))
+            if (!generators.TryGetValue(field, out generator))
             {
-                return null;
+                return false;
             }
 
-            return generator;
+            return true;
         }
     }
 }
