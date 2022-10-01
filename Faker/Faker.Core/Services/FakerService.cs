@@ -18,7 +18,7 @@ namespace Faker.Core.Services
             _generatedTypes = new();
         }
 
-        public FakerService(IFakerConfig config) : base()
+        public FakerService(IFakerConfig config) : this()
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
@@ -57,7 +57,8 @@ namespace Faker.Core.Services
             constructedObject = Default(type);
 
             var constructors = type.GetConstructors()
-                .OrderByDescending(c => c.GetParameters().Length);
+                .OrderByDescending(c => c.GetParameters().Length)
+                .ToList();
             
             foreach (var constructor in constructors)
             {
@@ -77,7 +78,7 @@ namespace Faker.Core.Services
 
         private object GenerateMemberValue(Type type, Type memberType, string memberName)
         {
-            if (_config.TryGetGenerator(type, memberName, out var generator))
+            if (_config != null && _config.TryGetGenerator(type, memberName, out var generator))
             {
                 return generator.Generate(memberType, _context) ?? Create(memberType);
             }
@@ -101,7 +102,9 @@ namespace Faker.Core.Services
             var fields = objectType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var field in fields)
             {
-                if (field.IsInitOnly || field.GetValue(constructedObject) != Default(objectType))
+                var currentValue = field.GetValue(constructedObject);
+                var defaultValue = Default(field.FieldType);
+                if (field.IsInitOnly || (!currentValue.Equals(defaultValue)))
                 {
                     continue;
                 }
@@ -113,7 +116,11 @@ namespace Faker.Core.Services
             var properties = objectType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var property in properties)
             {
-                if ((!property.CanWrite) || property.GetValue(constructedObject) != Default(objectType))
+                var currentValue = property.GetValue(constructedObject);
+                var defaultValue = Default(property.PropertyType);
+                if ((!property.CanWrite) 
+                    || property.GetIndexParameters().Any() 
+                    || (!currentValue.Equals(defaultValue)))
                 {
                     continue;
                 }
