@@ -56,6 +56,11 @@ namespace Faker.Core.Services
         {
             constructedObject = Default(type);
 
+            if (type.IsValueType)
+            {
+                return true;
+            }
+
             var constructors = type.GetConstructors()
                 .OrderByDescending(c => c.GetParameters().Length)
                 .ToList();

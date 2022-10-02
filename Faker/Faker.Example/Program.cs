@@ -36,17 +36,12 @@ class ManNameGenerator : IGenerator
     public object Generate(Type typeToGenerate, GeneratorContext context) => "Maksik";
 }
 
-class Dog
+struct Dog
 {
     public int Id { get; set; }
     public string Name { get; set; }
     public Man Man { get; set; }
     public List<char> Chars { get; set; }
-
-    public Dog()
-    {
-        Id = 15;
-    }
 }
 
 class Man
@@ -58,8 +53,6 @@ class Man
 
     public Man()
     {
-        DateOfBirth = DateTime.UtcNow;
+        DateOfBirth = new DateTime(1990, 1, 1);
     }
 }
-
-
