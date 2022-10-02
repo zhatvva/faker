@@ -56,7 +56,7 @@ namespace Faker.Core.Services
         {
             constructedObject = Default(type);
 
-            if (type.IsValueType)
+            if (type.IsValueType && !type.IsEnum)
             {
                 return true;
             }
