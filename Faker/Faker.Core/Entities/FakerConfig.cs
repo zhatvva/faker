@@ -39,5 +39,15 @@ namespace Faker.Core.Entities
 
             return true;
         }
+
+        public bool HasGenerator(Type type, string field)
+        {
+            if (!_configuredGenerators.TryGetValue(type, out var generators))
+            {
+                return false;
+            }
+
+            return generators.ContainsKey(field);
+        }
     }
 }

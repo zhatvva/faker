@@ -45,11 +45,11 @@ namespace Faker.Core.Services
 
             if (!TryConstructObject(type, out var constructedObject))
             {
-                return Result(constructedObject);
+                return Result(constructedObject, type);
             }
             FillMembers(type, constructedObject);
 
-            return Result(constructedObject);
+            return Result(constructedObject, type);
         }
 
         private bool TryConstructObject(Type type, out object constructedObject)
@@ -75,6 +75,8 @@ namespace Faker.Core.Services
 
             return false;
         }
+
+        private bool HasGenerator(Type type, string field) => _config != null && _config.HasGenerator(type, field);
 
         private object GenerateMemberValue(Type type, Type memberType, string memberName)
         {
@@ -102,9 +104,9 @@ namespace Faker.Core.Services
             var fields = objectType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var field in fields)
             {
-                var currentValue = field.GetValue(constructedObject);
-                var defaultValue = Default(field.FieldType);
-                if (field.IsInitOnly || (!currentValue.Equals(defaultValue)))
+                var isDefault = Equal(field.GetValue(constructedObject), Default(field.FieldType));
+                var hasGenerator = HasGenerator(objectType, field.Name);
+                if (field.IsInitOnly || (!(isDefault || hasGenerator)))
                 {
                     continue;
                 }
@@ -116,11 +118,11 @@ namespace Faker.Core.Services
             var properties = objectType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var property in properties)
             {
-                var currentValue = property.GetValue(constructedObject);
-                var defaultValue = Default(property.PropertyType);
-                if ((!property.CanWrite) 
-                    || property.GetIndexParameters().Any() 
-                    || (!currentValue.Equals(defaultValue)))
+                var isIndexer = property.GetIndexParameters().Any();
+                var hasGenerator = HasGenerator(objectType, property.Name);
+                if ((!property.CanWrite)
+                    || isIndexer
+                    || (!(Equal(property.GetValue(constructedObject), Default(property.PropertyType)) || hasGenerator)))
                 {
                     continue;
                 }
@@ -130,11 +132,13 @@ namespace Faker.Core.Services
             }
         }
 
+        private static bool Equal(object obj1, object obj2) => obj1 != null ? obj1.Equals(obj2) : obj2 == null;
+
         private static object Default(Type type) => type.IsValueType ? Activator.CreateInstance(type) : null;
 
-        private object Result<T>(T obj)
+        private object Result(object obj, Type type)
         {
-            _generatedTypes.Remove(typeof(T));
+            _generatedTypes.Remove(type);
             return obj;
         }
     }

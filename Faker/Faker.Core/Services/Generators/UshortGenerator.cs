@@ -9,7 +9,7 @@ namespace Faker.Core.Services.Generators
         
         public object Generate(Type _, GeneratorContext context)
         {
-            var value = (ushort)context.Random.Next(ushort.MaxValue);
+            var value = (ushort)context.Random.Next(sbyte.MaxValue - 1) + 1;
             return value;
         }
     }
