@@ -119,5 +119,17 @@ namespace Faker.Core.Tests
                 Assert.NotEqual(default, item);
             }
         }
+
+        [Fact]
+        public void StructWithConstructor()
+        {
+            var faker = new FakerService();
+
+            var cat = faker.Create<Cat>();
+
+            Assert.NotEqual(default, cat.Age);
+            Assert.NotEqual(default, cat.Color);
+            Assert.Equal(Cat.DefaultName, cat.Name);
+        }
     }
 }

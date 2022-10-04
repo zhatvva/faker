@@ -16,7 +16,7 @@ namespace Faker.Core.Entities
                 throw new ArgumentException("Invalid expression type. MemberExpression expected", nameof(expression));
             }
             
-            var fieldName = memberExpression.Member.Name;
+            var fieldName = FirstCharToLowerCase(memberExpression.Member.Name);
             var type = typeof(TType);
             var generator = (IGenerator)Activator.CreateInstance(typeof(TGenerator));
 
@@ -32,6 +32,7 @@ namespace Faker.Core.Entities
                 return false;
             }
 
+            field = FirstCharToLowerCase(field);
             if (!generators.TryGetValue(field, out generator))
             {
                 return false;
@@ -47,7 +48,10 @@ namespace Faker.Core.Entities
                 return false;
             }
 
+            field = FirstCharToLowerCase(field);
             return generators.ContainsKey(field);
         }
+
+        private static string FirstCharToLowerCase(string str) => $"{char.ToLower(str[0])}{str[1..]}";
     }
 }

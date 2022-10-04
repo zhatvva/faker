@@ -10,7 +10,7 @@ namespace Faker.Core.Tests.Models
         public int Id { get; set; }
         public DateTime DateOfBirth { get; set; } = DefaultDateOfBirth;
         public List<Dog> Dogs { get; set; }
-        public string Name { get; set; }
+        public string Name { get; }
 
         public Man(string name)
         {

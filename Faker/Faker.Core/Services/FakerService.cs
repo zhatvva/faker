@@ -56,11 +56,6 @@ namespace Faker.Core.Services
         {
             constructedObject = Default(type);
 
-            if (type.IsValueType && !type.IsEnum)
-            {
-                return true;
-            }
-
             var constructors = type.GetConstructors()
                 .OrderByDescending(c => c.GetParameters().Length)
                 .ToList();
@@ -76,6 +71,11 @@ namespace Faker.Core.Services
                     return true;
                 }
                 catch { }
+            }
+
+            if (type.IsValueType && !type.IsEnum)
+            {
+                return true;
             }
 
             return false;
